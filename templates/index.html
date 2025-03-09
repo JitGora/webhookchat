@@ -105,7 +105,7 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h2>Chat Application</h2>
+            <h2>Medichat Ai</h2>
         </div>
         <div class="chat-messages" id="chat-messages">
             <!-- Messages will appear here -->
@@ -139,31 +139,32 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             
             // Send to Flask backend
-            fetch('/send', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: message
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Remove typing indicator
-                document.getElementById('typing-indicator').remove();
-                
-                // Display response from webhook
-                addMessage(data.response || data.message || JSON.stringify(data), 'response-message');
-            })
-            .catch(error => {
-                // Remove typing indicator
-                document.getElementById('typing-indicator').remove();
-                
-                // Display error
-                addMessage("Sorry, there was an error processing your request.", 'response-message');
-                console.error('Error:', error);
-            });
+// Send to Flask backend
+fetch('/send', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        message: message
+    })
+})
+.then(response => response.json())
+.then(data => {
+    // Remove typing indicator
+    document.getElementById('typing-indicator').remove();
+    
+    // Display text response from webhook
+    addMessage(data.response, 'response-message');
+})
+.catch(error => {
+    // Remove typing indicator
+    document.getElementById('typing-indicator').remove();
+    
+    // Display error
+    addMessage("Sorry, there was an error processing your request.", 'response-message');
+    console.error('Error:', error);
+});
         }
         
         // Add a message to the chat

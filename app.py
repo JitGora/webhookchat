@@ -5,7 +5,7 @@ import json
 app = Flask(__name__)
 
 # Webhook URL
-WEBHOOK_URL = "http://172.22.0.3:5678/webhook-test/230459d0-9157-4f5b-bb8b-24f1f8014ca4"
+WEBHOOK_URL = "http://172.22.0.3:5678/webhook/230459d0-9157-4f5b-bb8b-24f1f8014ca4"
 
 @app.route('/')
 def index():
@@ -24,11 +24,11 @@ def send_message():
             headers={"Content-Type": "application/json"}
         )
         
-        # Return the webhook response
-        return jsonify(response.json())
+       # Return the webhook response as text
+        return jsonify({"response": response.text})
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": "Failed to get response from webhook"}), 500
-
+    
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
