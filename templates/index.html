@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f7fa;
+        }
+        
+        .chat-container {
+            width: 90%;
+            max-width: 500px;
+            height: 80vh;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            padding: 20px;
+            background-color: #6366f1;
+            color: white;
+            text-align: center;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 75%;
+            word-wrap: break-word;
+        }
+        
+        .user-message {
+            background-color: #6366f1;
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        
+        .response-message {
+            background-color: #f1f1f1;
+            color: #333;
+            align-self: flex-start;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+            font-size: 16px;
+        }
+        
+        .chat-input button {
+            margin-left: 10px;
+            padding: 12px 20px;
+            background-color: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .chat-input button:hover {
+            background-color: #4f46e5;
+        }
+        
+        .typing-indicator {
+            color: #888;
+            font-style: italic;
+            align-self: flex-start;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Chat Application</h2>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Messages will appear here -->
+        </div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const messagesContainer = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        
+        // Handle sending messages
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            // Display user message
+            addMessage(message, 'user-message');
+            userInput.value = '';
+            
+            // Show "typing" indicator
+            const typingElement = document.createElement('div');
+            typingElement.textContent = "Processing...";
+            typingElement.className = "message response-message typing-indicator";
+            typingElement.id = "typing-indicator";
+            messagesContainer.appendChild(typingElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Send to Flask backend
+            fetch('/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove typing indicator
+                document.getElementById('typing-indicator').remove();
+                
+                // Display response from webhook
+                addMessage(data.response || data.message || JSON.stringify(data), 'response-message');
+            })
+            .catch(error => {
+                // Remove typing indicator
+                document.getElementById('typing-indicator').remove();
+                
+                // Display error
+                addMessage("Sorry, there was an error processing your request.", 'response-message');
+                console.error('Error:', error);
+            });
+        }
+        
+        // Add a message to the chat
+        function addMessage(text, className) {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = text;
+            messageElement.className = `message ${className}`;
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Initial message
+        addMessage("Welcome! How can I help you today?", 'response-message');
+    </script>
+</body>
+</html>
