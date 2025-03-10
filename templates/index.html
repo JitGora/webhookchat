@@ -1,191 +1,257 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Application</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f5f7fa;
+            background-color: white; /* Ensure the iframe has a white background */
         }
+
         
-        .chat-container {
-            width: 90%;
-            max-width: 500px;
-            height: 80vh;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        
-        .chat-header {
-            padding: 20px;
-            background-color: #6366f1;
-            color: white;
-            text-align: center;
-        }
-        
-        .chat-messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .message {
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            border-radius: 18px;
-            max-width: 75%;
-            word-wrap: break-word;
-        }
-        
-        .user-message {
-            background-color: #6366f1;
-            color: white;
-            align-self: flex-end;
-            margin-left: auto;
-        }
-        
-        .response-message {
-            background-color: #f1f1f1;
-            color: #333;
-            align-self: flex-start;
-        }
-        
-        .chat-input {
-            display: flex;
-            padding: 15px;
-            border-top: 1px solid #eaeaea;
-        }
-        
-        .chat-input input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            outline: none;
-            font-size: 16px;
-        }
-        
-        .chat-input button {
-            margin-left: 10px;
-            padding: 12px 20px;
-            background-color: #6366f1;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        
-        .chat-input button:hover {
-            background-color: #4f46e5;
-        }
-        
-        .typing-indicator {
-            color: #888;
-            font-style: italic;
-            align-self: flex-start;
-        }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+body { font-family: 'Inter', sans-serif; }
+
+
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h2>Medichat Ai</h2>
-        </div>
-        <div class="chat-messages" id="chat-messages">
-            <!-- Messages will appear here -->
-        </div>
-        <div class="chat-input">
-            <input type="text" id="user-input" placeholder="Type your message...">
-            <button id="send-button">Send</button>
-        </div>
-    </div>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedMind - Clinical Decision Support</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+body { font-family: 'Inter', sans-serif; }
+</style>
+</head>
+<body class="bg-slate-50 h-screen flex flex-col">
+<!-- Header -->
+<header class="bg-white border-b border-slate-200 py-3 px-4">
+<div class="max-w-3xl mx-auto flex items-center">
+<div class="flex-1">
+<h1 class="text-slate-800 font-semibold text-lg">MedMind</h1>
+<p class="text-slate-500 text-sm">Clinical Decision Support System</p>
+</div>
+<div class="w-8 h-8 bg-blue-500 rounded-full"></div>
+</div>
+</header>
 
-    <script>
-        const messagesContainer = document.getElementById('chat-messages');
-        const userInput = document.getElementById('user-input');
-        const sendButton = document.getElementById('send-button');
-        
-        // Handle sending messages
-        function sendMessage() {
-            const message = userInput.value.trim();
-            if (!message) return;
-            
-            // Display user message
-            addMessage(message, 'user-message');
-            userInput.value = '';
-            
-            // Show "typing" indicator
-            const typingElement = document.createElement('div');
-            typingElement.textContent = "Processing...";
-            typingElement.className = "message response-message typing-indicator";
-            typingElement.id = "typing-indicator";
-            messagesContainer.appendChild(typingElement);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            
-            // Send to Flask backend
+<!-- Chat Messages -->
+<main class="flex-1 overflow-y-auto p-4 max-w-3xl mx-auto w-full">
+<!-- Initial Bot Message -->
+<div class="group flex gap-3 mb-4 py-2">
+<div class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium">AI</div>
+<div class="flex-1">
+<p class="text-slate-800 leading-relaxed">Welcome! How can I help you today?</p>
+<div class="mt-1 text-slate-400 text-xs">Medical Literature Verified</div>
+</div>
+</div>
+
+<!-- Messages Container -->
+<div id="chat-messages"></div>
+
+<!-- Typing Indicator -->
+<div id="typing-indicator" class="hidden flex gap-3 mb-4">
+<div class="w-6 h-6 bg-blue-100 rounded-full animate-pulse"></div>
+<div class="flex-1 space-y-2">
+<div class="h-3 bg-slate-100 rounded w-1/4 animate-pulse"></div>
+<div class="h-3 bg-slate-100 rounded w-1/2 animate-pulse"></div>
+</div>
+</div>
+</main>
+
+<!-- Input Area -->
+<footer class="bg-white border-t border-slate-200 p-4">
+<div class="max-w-3xl mx-auto relative">
+<input
+id="user-input"
+type="text"
+placeholder="Enter clinical presentation..."
+class="w-full p-3 pr-12 text-slate-800 bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+/>
+<button id="send-button" class="absolute right-3 bottom-3 w-8 h-8 bg-blue-500 text-white rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors">
+↵
+</button>
+</div>
+<p class="text-center text-slate-400 text-xs mt-2">For urgent clinical matters, always follow hospital protocols</p>
+</footer>
+
+<script>
+const messagesContainer = document.getElementById('chat-messages');
+const userInput = document.getElementById('user-input');
+const sendButton = document.getElementById('send-button');
+const typingIndicator = document.getElementById('typing-indicator');
+
+// Handle sending messages
+function sendMessage() {
+const message = userInput.value.trim();
+if (!message) return;
+
+// Display user message
+addMessage(message, 'user-message');
+userInput.value = '';
+
+// Show typing indicator
+typingIndicator.classList.remove('hidden');
+
 // Send to Flask backend
 fetch('/send', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        message: message
-    })
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({
+message: message
+})
 })
 .then(response => response.json())
 .then(data => {
-    // Remove typing indicator
-    document.getElementById('typing-indicator').remove();
-    
-    // Display text response from webhook
-    addMessage(data.response, 'response-message');
+// Remove typing indicator
+typingIndicator.classList.add('hidden');
+
+// Display text response from webhook
+addMessage(data.response, 'bot-message');
 })
 .catch(error => {
-    // Remove typing indicator
-    document.getElementById('typing-indicator').remove();
-    
-    // Display error
-    addMessage("Sorry, there was an error processing your request.", 'response-message');
-    console.error('Error:', error);
+// Remove typing indicator
+typingIndicator.classList.add('hidden');
+
+// Display error
+addMessage("Sorry, there was an error processing your request.", 'bot-message');
+console.error('Error:', error);
 });
-        }
+}
+
+// Add a message to the chat
+function addMessage(text, className) {
+const messageElement = document.createElement('div');
+if (className === 'user-message') {
+messageElement.className = 'group flex gap-3 mb-4 py-2 justify-end';
+messageElement.innerHTML = `
+<div class=" max-w-full"> <!-- Removed max-w-[85%] and added max-w-full -->
+<div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+    <p class="text-slate-800">${text}</p>
+</div>
+<div class="mt-1 text-slate-400 text-xs text-right">Today 14:32</div>
+</div>
+<div class="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center text-xs">MD</div>
+`;
+} else {
+messageElement.className = 'group flex gap-3 mb-4 py-2';
+messageElement.innerHTML = `
+<div class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium">AI</div>
+<div class="flex-1">
+<p class="text-slate-800 leading-relaxed">${text}</p>
+<div class="mt-1 text-slate-400 text-xs">Medical Literature Verified</div>
+</div>
+`;
+}
+messagesContainer.appendChild(messageElement);
+messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Event listeners
+sendButton.addEventListener('click', sendMessage);
+userInput.addEventListener('keypress', (e) => {
+if (e.key === 'Enter') {
+sendMessage();
+}
+});
+</script>
+</body>
+</html>
+
+
+
+    <script>
         
-        // Add a message to the chat
-        function addMessage(text, className) {
-            const messageElement = document.createElement('div');
-            messageElement.textContent = text;
-            messageElement.className = `message ${className}`;
-            messagesContainer.appendChild(messageElement);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-        
-        // Event listeners
-        sendButton.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-        
-        // Initial message
-        addMessage("Welcome! How can I help you today?", 'response-message');
+const messagesContainer = document.getElementById('chat-messages');
+const userInput = document.getElementById('user-input');
+const sendButton = document.getElementById('send-button');
+const typingIndicator = document.getElementById('typing-indicator');
+
+// Handle sending messages
+function sendMessage() {
+const message = userInput.value.trim();
+if (!message) return;
+
+// Display user message
+addMessage(message, 'user-message');
+userInput.value = '';
+
+// Show typing indicator
+typingIndicator.classList.remove('hidden');
+
+// Send to Flask backend
+fetch('/send', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({
+message: message
+})
+})
+.then(response => response.json())
+.then(data => {
+// Remove typing indicator
+typingIndicator.classList.add('hidden');
+
+// Display text response from webhook
+addMessage(data.response, 'bot-message');
+})
+.catch(error => {
+// Remove typing indicator
+typingIndicator.classList.add('hidden');
+
+// Display error
+addMessage("Sorry, there was an error processing your request.", 'bot-message');
+console.error('Error:', error);
+});
+}
+
+// Add a message to the chat
+function addMessage(text, className) {
+const messageElement = document.createElement('div');
+if (className === 'user-message') {
+messageElement.className = 'group flex gap-3 mb-4 py-2 justify-end';
+messageElement.innerHTML = `
+<div class=" max-w-full"> <!-- Removed max-w-[85%] and added max-w-full -->
+<div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+    <p class="text-slate-800">${text}</p>
+</div>
+<div class="mt-1 text-slate-400 text-xs text-right">Today 14:32</div>
+</div>
+<div class="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center text-xs">MD</div>
+`;
+} else {
+messageElement.className = 'group flex gap-3 mb-4 py-2';
+messageElement.innerHTML = `
+<div class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium">AI</div>
+<div class="flex-1">
+<p class="text-slate-800 leading-relaxed">${text}</p>
+<div class="mt-1 text-slate-400 text-xs">Medical Literature Verified</div>
+</div>
+`;
+}
+messagesContainer.appendChild(messageElement);
+messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Event listeners
+sendButton.addEventListener('click', sendMessage);
+userInput.addEventListener('keypress', (e) => {
+if (e.key === 'Enter') {
+sendMessage();
+}
+});
+
+
     </script>
 </body>
 </html>
