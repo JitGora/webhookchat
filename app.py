@@ -15,16 +15,22 @@ def index():
 def send_message():
     data = request.get_json()
     user_message = data.get('message', '')
+    cf_authorization = data.get('cf_authorization', '')
+    cf_appsession = data.get('cf_appsession', '')
     
-    # Forward the message to the webhook
+    # Forward the message to the webhook along with JWT and session ID
     try:
         response = requests.post(
             WEBHOOK_URL,
-            json={"message": user_message},
+            json={
+                "message": user_message,
+                "cf_authorization": cf_authorization,
+                "cf_appsession": cf_appsession
+            },
             headers={"Content-Type": "application/json"}
         )
         
-       # Return the webhook response as text
+        # Return the webhook response as text
         return jsonify({"response": response.text})
     except Exception as e:
         print(f"Error: {e}")
