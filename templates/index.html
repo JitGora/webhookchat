@@ -5,9 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MedMind - Clinical Decision Support</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Add DOMPurify for sanitizing HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
         body { font-family: 'Inter', sans-serif; }
+        /* Style for code blocks */
+        pre, code {
+            background-color: #f1f5f9;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        pre {
+            padding: 10px;
+            overflow-x: auto;
+        }
+        /* Style for blockquotes */
+        blockquote {
+            border-left: 4px solid #e2e8f0;
+            padding-left: 10px;
+            color: #64748b;
+            margin: 0;
+        }
+        /* Style for lists */
+        ul, ol {
+            margin-left: 20px;
+        }
     </style>
 </head>
 <body class="bg-slate-50 h-screen flex flex-col">
@@ -23,14 +50,6 @@
     </header>
     <!-- Chat Messages -->
     <main class="flex-1 overflow-y-auto p-4 max-w-3xl mx-auto w-full">
-        <!-- Initial Bot Message -->
-        <!-- <div class="group flex gap-3 mb-4 py-2">
-            <div class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium">AI</div>
-            <div class="flex-1">
-                <p class="text-slate-800 leading-relaxed">Welcome! How can I help you today?</p>
-                <div class="mt-1 text-slate-400 text-xs">Medical Literature Verified</div>
-            </div>
-        </div> -->
         <!-- Messages Container -->
         <div id="chat-messages"></div>
         <!-- Typing Indicator -->
@@ -48,7 +67,7 @@
             <input
                 id="user-input"
                 type="text"
-                placeholder="Enter clinical presentation..."
+                placeholder="Enter clinical presentation (Markdown supported)..."
                 class="w-full p-3 pr-12 text-slate-800 bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <button id="send-button" class="absolute right-3 bottom-3 w-8 h-8 bg-blue-500 text-white rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors">
@@ -70,7 +89,6 @@
             if (parts.length === 2) return parts.pop().split(';').shift();
         }
 
-
         // Handle sending messages
         function sendMessage() {
             const message = userInput.value.trim();
@@ -79,7 +97,6 @@
             // Get JWT and session ID from cookies
             const cfAuthorization = getCookie('CF_Authorization');
             const cfAppSession = getCookie('CF_AppSession');
-
 
             // Display user message
             addMessage(message, 'user-message');
@@ -115,15 +132,20 @@
                 console.error('Error:', error);
             });
         }
-        // Add a message to the chat
+
+        // Add a message to the chat with Markdown rendering
         function addMessage(text, className) {
             const messageElement = document.createElement('div');
+            // Parse Markdown and sanitize the output
+            const markdownText = marked.parse(text);
+            const sanitizedText = DOMPurify.sanitize(markdownText);
+
             if (className === 'user-message') {
                 messageElement.className = 'group flex gap-3 mb-4 py-2 justify-end';
                 messageElement.innerHTML = `
-                    <div class=" max-w-full"> <!-- Removed max-w-[85%] and added max-w-full -->
+                    <div class="max-w-full">
                         <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                            <p class="text-slate-800">${text}</p>
+                            <div class="text-slate-800 markdown-content">${sanitizedText}</div>
                         </div>
                         <div class="mt-1 text-slate-400 text-xs text-right">Today 14:32</div>
                     </div>
@@ -134,14 +156,16 @@
                 messageElement.innerHTML = `
                     <div class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium">AI</div>
                     <div class="flex-1">
-                        <p class="text-slate-800 leading-relaxed">${text}</p>
+                        <div class="text-slate-800 leading-relaxed markdown-content">${sanitizedText}</div>
                         <div class="mt-1 text-slate-400 text-xs">Medical Literature Not Verified</div>
                     </div>
                 `;
             }
+
             messagesContainer.appendChild(messageElement);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
+
         // Event listeners
         sendButton.addEventListener('click', sendMessage);
         userInput.addEventListener('keypress', (e) => {
