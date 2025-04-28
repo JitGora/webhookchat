@@ -1,11 +1,14 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 import json
+import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
+load_dotenv()
 
-# Webhook URL
-WEBHOOK_URL = "http://172.22.0.3:5678/webhook/230459d0-9157-4f5b-bb8b-24f1f8014ca4"
+# Webhook URL from environment variable
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
 @app.route('/')
 def index():
