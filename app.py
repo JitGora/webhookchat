@@ -19,7 +19,7 @@ def send_message():
     data = request.get_json()
     user_message = data.get('message', '')
     cf_authorization = data.get('cf_authorization', '')
-    cf_appsession = data.get('cf_appsession', '')
+    cf_appsession = data.get('CF_AppSession', '')
     
     # Forward the message to the webhook along with JWT and session ID
     try:
@@ -27,8 +27,8 @@ def send_message():
             WEBHOOK_URL,
             json={
                 "message": user_message,
-                "cf_authorization": cf_authorization,
-                "cf_appsession": cf_appsession
+                "CF_Authorization": cf_authorization,
+                "cf_AppSession": cf_appsession
             },
             headers={"Content-Type": "application/json"}
         )
