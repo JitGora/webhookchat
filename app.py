@@ -18,8 +18,9 @@ def index():
 def send_message():
     data = request.get_json()
     user_message = data.get('message', '')
-    cf_authorization = data.get('cf_authorization', '')
-    cf_appsession = data.get('CF_AppSession', '')
+    # Read cookies from request headers instead of body
+    cf_authorization = request.cookies.get('CF_Authorization', '') 
+    cf_appsession = request.cookies.get('CF_AppSession', '')
     
     # Forward the message to the webhook along with JWT and session ID
     try:
