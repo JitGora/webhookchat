@@ -9,19 +9,27 @@
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        html, body { height: 100%; overflow: hidden; }
-        body { display: flex; flex-direction: column; }
+        body { 
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        html, body { 
+            height: 100%; 
+            overflow: hidden; 
+        }
+        body { 
+            display: flex; 
+            flex-direction: column; 
+            background-color: #f8fafc;
+        }
         main {
             flex: 1;
             overflow-y: auto;
-            /* Adjust padding based on final footer height */
-            padding-bottom: 150px; /* Start guess, will be adjusted by JS */
+            padding-bottom: 150px; /* Initial padding */
         }
         main::-webkit-scrollbar { display: none; }
         #file-input, #photo-input { display: none; }
 
-        /* Style for code blocks (from original) */
         pre, code {
             background-color: #f1f5f9;
             padding: 2px 4px;
@@ -29,32 +37,27 @@
             font-family: 'Courier New', Courier, monospace;
         }
         pre { padding: 10px; overflow-x: auto; }
-        /* Style for blockquotes (from original) */
+        
         blockquote {
             border-left: 4px solid #e2e8f0;
             padding-left: 10px;
             color: #64748b;
             margin: 0;
         }
-        /* Style for lists (from original) */
+        
         ul, ol { margin-left: 20px; }
-
-        /* Style for the disclaimer - transparent background by default */
-        .disclaimer-text {
-            background-color: transparent; /* Or use rgba(248, 250, 252, 0.8) for subtle bg */
-        }
-        /* Style for image previews in chat (needed for file handling) */
+        
         .chat-image-preview {
             max-width: 200px;
             max-height: 200px;
-            border-radius: 0.5rem; /* Match bubble radius */
+            border-radius: 0.5rem;
             margin-bottom: 8px;
             display: block;
         }
     </style>
 </head>
-<body class="bg-slate-50 h-screen flex flex-col">
-    <!-- Header (from second version) -->
+<body class="flex flex-col">
+    <!-- Enhanced Header -->
     <header class="bg-white border-b border-slate-200 py-3 px-4 sticky top-0 z-10">
         <div class="max-w-3xl mx-auto flex items-center">
             <div class="flex items-center gap-2">
@@ -64,27 +67,25 @@
         </div>
     </header>
 
-    <!-- Chat Messages -->
+    <!-- Chat Messages Container -->
     <main class="flex-1 overflow-y-auto p-4 max-w-3xl mx-auto w-full relative">
-        <!-- Messages Container -->
         <div id="chat-messages"></div>
-        <!-- Typing Indicator (from original, slightly adapted structure for consistency) -->
         <div id="typing-indicator" class="hidden flex gap-3 mb-4 py-2">
-             <div class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">AI</div>
-             <div class="flex items-center space-x-1 mt-2"> <!-- Mimic pulse -->
-                 <div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse delay-75"></div>
-                 <div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse delay-150"></div>
-                 <div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse delay-300"></div>
-             </div>
+            <div class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">AI</div>
+            <div class="flex items-center space-x-1 mt-2">
+                <div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse delay-75"></div>
+                <div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse delay-150"></div>
+                <div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse delay-300"></div>
+            </div>
         </div>
     </main>
 
-    <!-- Footer (Floating structure from second version) -->
-    <footer class="sticky bottom-0 left-0 right-0 p-4 z-10 pointer-events-none bg-slate-50">
+    <!-- Enhanced Footer -->
+    <footer class="sticky bottom-0 left-0 right-0 p-4 bg-slate-50 z-10">
         <div class="max-w-3xl mx-auto">
-            <div class="relative pointer-events-auto">
+            <div class="relative">
                 <div class="bg-white/80 backdrop-blur-sm rounded-xl border border-slate-200/80 shadow-lg">
-                    <!-- Attachment Preview (Unified for File/Photo) -->
+                    <!-- Attachment Preview -->
                     <div id="attachment-preview" class="hidden p-3 border-b border-slate-200/50">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2 overflow-hidden">
@@ -107,14 +108,12 @@
 
                     <!-- Input Area -->
                     <div class="p-2 flex items-center">
-                         <div class="flex space-x-1">
-                            <!-- File Attachment Button -->
+                        <div class="flex space-x-1">
                             <button id="file-attach-button" class="p-2 text-slate-400 hover:text-blue-500 rounded-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                 </svg>
                             </button>
-                            <!-- Photo Attachment Button -->
                             <button id="photo-attach-button" class="p-2 text-slate-400 hover:text-blue-500 rounded-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -127,7 +126,6 @@
                             placeholder="Enter your query..."
                             class="w-full py-2 px-3 text-slate-800 bg-transparent border-none rounded-full focus:outline-none focus:ring-0"
                         />
-                        <!-- Send Button with Icon -->
                         <button id="send-button" class="ml-1 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors flex-shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
@@ -137,13 +135,12 @@
                     <input type="file" id="file-input" accept=".pdf,.doc,.docx,.txt">
                     <input type="file" id="photo-input" accept="image/*">
                 </div>
-                <!-- Disclaimer with specific class (from second version) -->
-                <p class="disclaimer-text text-center text-slate-400 text-xs mt-2 px-2">Responses are AI-generated for informational purposes.</p>
+                <p class="text-center text-slate-400 text-xs mt-2 px-2">Responses are AI-generated for informational purposes.</p>
             </div>
         </div>
     </footer>
 
-    <script>
+        <script>
         const messagesContainer = document.getElementById('chat-messages');
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
