@@ -2,41 +2,60 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>MedMind - Clinical Decision Support</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
     <style>
+        :root {
+            --sat: env(safe-area-inset-bottom);
+        }
+        
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-        body { 
+        
+        body {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
+            padding-bottom: var(--sat);
+            background-color: white;
         }
-        html, body { 
-            height: 100%; 
-            overflow: hidden; 
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
         }
-        body { 
-            display: flex; 
-            flex-direction: column; 
-            background-color: #f8fafc;
+        
+        body {
+            display: flex;
+            flex-direction: column;
         }
+        
         main {
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 150px; /* Initial padding */
+            padding-bottom: calc(150px + var(--sat));
         }
-        main::-webkit-scrollbar { display: none; }
-        #file-input, #photo-input { display: none; }
-
+        
+        main::-webkit-scrollbar {
+            display: none;
+        }
+        
+        #file-input, #photo-input {
+            display: none;
+        }
+        
         pre, code {
             background-color: #f1f5f9;
             padding: 2px 4px;
             border-radius: 4px;
             font-family: 'Courier New', Courier, monospace;
         }
-        pre { padding: 10px; overflow-x: auto; }
+        
+        pre {
+            padding: 10px;
+            overflow-x: auto;
+        }
         
         blockquote {
             border-left: 4px solid #e2e8f0;
@@ -45,7 +64,9 @@
             margin: 0;
         }
         
-        ul, ol { margin-left: 20px; }
+        ul, ol {
+            margin-left: 20px;
+        }
         
         .chat-image-preview {
             max-width: 200px;
@@ -56,8 +77,8 @@
         }
     </style>
 </head>
-<body class="flex flex-col">
-    <!-- Enhanced Header -->
+<body class="flex flex-col bg-slate-50">
+    <!-- Header -->
     <header class="bg-white border-b border-slate-200 py-3 px-4 sticky top-0 z-10">
         <div class="max-w-3xl mx-auto flex items-center">
             <div class="flex items-center gap-2">
@@ -67,9 +88,11 @@
         </div>
     </header>
 
-    <!-- Chat Messages Container -->
-    <main class="flex-1 overflow-y-auto p-4 max-w-3xl mx-auto w-full relative">
+    <!-- Chat Messages -->
+    <main class="flex-1 overflow-y-auto p-4 max-w-3xl mx-auto w-full">
         <div id="chat-messages"></div>
+        
+        <!-- Typing Indicator -->
         <div id="typing-indicator" class="hidden flex gap-3 mb-4 py-2">
             <div class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">AI</div>
             <div class="flex items-center space-x-1 mt-2">
@@ -80,8 +103,8 @@
         </div>
     </main>
 
-    <!-- Enhanced Footer -->
-    <footer class="sticky bottom-0 left-0 right-0 p-4 bg-slate-50 z-10">
+    <!-- Footer -->
+    <footer class="sticky bottom-0 left-0 right-0 p-4 bg-slate-50 z-10 pb-[var(--sat)]">
         <div class="max-w-3xl mx-auto">
             <div class="relative">
                 <div class="bg-white/80 backdrop-blur-sm rounded-xl border border-slate-200/80 shadow-lg">
@@ -91,7 +114,7 @@
                             <div class="flex items-center gap-2 overflow-hidden">
                                 <img id="attachment-thumb" class="h-8 w-8 rounded object-cover hidden" alt="preview">
                                 <svg id="attachment-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
                                 <div class="flex-1 overflow-hidden whitespace-nowrap">
                                     <span id="attachment-name" class="text-sm font-medium block overflow-hidden text-ellipsis"></span>
@@ -100,7 +123,7 @@
                             </div>
                             <button id="remove-attachment" class="text-slate-400 hover:text-slate-600 flex-shrink-0 ml-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
                             </button>
                         </div>
@@ -111,12 +134,12 @@
                         <div class="flex space-x-1">
                             <button id="file-attach-button" class="p-2 text-slate-400 hover:text-blue-500 rounded-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
                                 </svg>
                             </button>
                             <button id="photo-attach-button" class="p-2 text-slate-400 hover:text-blue-500 rounded-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
                             </button>
                         </div>
@@ -128,7 +151,7 @@
                         />
                         <button id="send-button" class="ml-1 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors flex-shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/>
                             </svg>
                         </button>
                     </div>
@@ -140,7 +163,7 @@
         </div>
     </footer>
 
-        <script>
+    <script>
         const messagesContainer = document.getElementById('chat-messages');
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
@@ -155,21 +178,21 @@
         const attachmentThumb = document.getElementById('attachment-thumb');
         const attachmentIcon = document.getElementById('attachment-icon');
         const removeAttachment = document.getElementById('remove-attachment');
+        
         let selectedFile = null;
-        let selectedFileDataUrl = null; // To store image data URL for message display
+        let selectedFileDataUrl = null;
 
-        // --- Attachment Handling (from second version) ---
+        // Attachment Handling
         fileAttachButton.addEventListener('click', () => fileInput.click());
         photoAttachButton.addEventListener('click', () => photoInput.click());
-
+        
         fileInput.addEventListener('change', handleFileSelect);
         photoInput.addEventListener('change', handleFileSelect);
 
         function handleFileSelect(e) {
             if (e.target.files.length > 0) {
                 selectedFile = e.target.files[0];
-                selectedFileDataUrl = null; // Reset data URL
-
+                selectedFileDataUrl = null;
                 attachmentName.textContent = selectedFile.name;
                 attachmentSize.textContent = formatFileSize(selectedFile.size);
 
@@ -179,13 +202,14 @@
                         attachmentThumb.src = event.target.result;
                         attachmentThumb.classList.remove('hidden');
                         attachmentIcon.classList.add('hidden');
-                        selectedFileDataUrl = event.target.result; // Store for message display
+                        selectedFileDataUrl = event.target.result;
                     }
                     reader.readAsDataURL(selectedFile);
                 } else {
                     attachmentThumb.classList.add('hidden');
                     attachmentIcon.classList.remove('hidden');
                 }
+
                 attachmentPreview.classList.remove('hidden');
                 adjustMainPadding();
             }
@@ -213,87 +237,79 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
         }
 
-        // --- Dynamic Padding Adjustment (from second version) ---
+        // Dynamic Padding Adjustment
         const mainElement = document.querySelector('main');
         const footerElement = document.querySelector('footer');
 
         function adjustMainPadding() {
-             requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
                 const footerHeight = footerElement.offsetHeight;
-                mainElement.style.paddingBottom = `${footerHeight + 16}px`;
-             });
+                const safeArea = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sat')) || 0;
+                mainElement.style.paddingBottom = `${footerHeight + 16 + safeArea}px`;
+            });
         }
+
         window.addEventListener('load', adjustMainPadding);
         window.addEventListener('resize', adjustMainPadding);
 
-        // --- Core Chat Logic ---
-        function getCookie(name) { // From original
+        // Core Chat Logic
+        function getCookie(name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
             if (parts.length === 2) return parts.pop().split(';').shift();
         }
 
-        function sendMessage() { // Adapted to handle files
+        function sendMessage() {
             const message = userInput.value.trim();
             const fileToSend = selectedFile;
             const imageDataUrlToSend = selectedFileDataUrl;
 
-            if (!message && !fileToSend) return; // Check both text and file
+            if (!message && !fileToSend) return;
 
             const cfAuthorization = getCookie('CF_Authorization');
             const cfAppSession = getCookie('CF_AppSession');
 
-            // Display user message using original style + file preview
             addMessage(message, 'user-message', fileToSend, imageDataUrlToSend);
             userInput.value = '';
-            clearAttachment(); // Clear file selection UI
-
+            clearAttachment();
             typingIndicator.classList.remove('hidden');
-            messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'smooth' }); // Add smooth scroll
+            messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'smooth' });
 
-            // Send to Flask backend (same as original, might need backend changes for files)
             fetch('/send', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    message: message, // Still sending only text for now
+                    message: message,
                     cf_authorization: cfAuthorization,
                     cf_appsession: cfAppSession
-                    // Add file info if backend expects it:
-                    // file_info: fileToSend ? { name: fileToSend.name, type: fileToSend.type, size: fileToSend.size } : null
                 })
-                // NOTE: Actual file upload requires FormData, not JSON.stringify
             })
             .then(response => response.json())
             .then(data => {
                 typingIndicator.classList.add('hidden');
-                // Display bot message using original style
                 addMessage(data.response, 'bot-message');
             })
             .catch(error => {
                 typingIndicator.classList.add('hidden');
-                // Display error using original bot style
                 addMessage("Sorry, there was an error processing your request.", 'bot-message');
                 console.error('Error:', error);
             });
         }
 
-        // Add a message - REVERTED TO ORIGINAL STYLES + file handling
         function addMessage(text, className, file = null, imageDataUrl = null) {
             const messageElement = document.createElement('div');
-            const markdownText = marked.parse(text || ''); // Handle empty text
+            const markdownText = marked.parse(text || '');
             const sanitizedText = DOMPurify.sanitize(markdownText, { USE_PROFILES: { html: true } });
 
             if (className === 'user-message') {
-                messageElement.className = 'group flex gap-3 mb-4 py-2 justify-end'; // Original class
-                let attachmentHTML = ''; // For file/image preview
-
-                 if (imageDataUrl) { // Display image preview
+                messageElement.className = 'group flex gap-3 mb-4 py-2 justify-end';
+                let attachmentHTML = '';
+                
+                if (imageDataUrl) {
                     attachmentHTML = `<img src="${imageDataUrl}" alt="${file?.name || 'Uploaded image'}" class="chat-image-preview">`;
-                } else if (file) { // Display file info for non-images
-                    // Simple file info, less styled than before to fit original look
+                } else if (file) {
                     attachmentHTML = `
                         <div class="mt-2 pt-2 border-t border-blue-100 text-xs text-slate-600">
                            Attachment: ${file.name} (${formatFileSize(file.size)})
@@ -302,38 +318,37 @@
                 }
 
                 messageElement.innerHTML = `
-                    <div class="max-w-full"> <!-- Original structure -->
+                    <div class="max-w-full">
                         <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                            ${attachmentHTML} <!-- Add attachment preview -->
+                            ${attachmentHTML}
                             ${text ? `<div class="text-slate-800 markdown-content">${sanitizedText}</div>` : ''}
-                            ${!text && file ? `<div class="text-slate-500 italic text-sm">Sent attachment</div>` : ''} ${/* Placeholder if only file */''}
+                            ${!text && file ? `<div class="text-slate-500 italic text-sm">Sent attachment</div>` : ''}
                         </div>
-                        <div class="mt-1 text-slate-400 text-xs text-right">Today 14:32</div> <!-- Original timestamp -->
+                        <div class="mt-1 text-slate-400 text-xs text-right">Today ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                     </div>
-                    <div class="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center text-xs flex-shrink-0">MD</div> <!-- Original avatar -->
+                    <div class="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center text-xs flex-shrink-0">MD</div>
                 `;
-            } else { // Bot message - Original Style
-                messageElement.className = 'group flex gap-3 mb-4 py-2'; // Original class
+            } else {
+                messageElement.className = 'group flex gap-3 mb-4 py-2';
                 messageElement.innerHTML = `
-                    <div class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">AI</div> <!-- Original avatar -->
-                    <div class="flex-1"> <!-- Original structure -->
+                    <div class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">AI</div>
+                    <div class="flex-1">
                         <div class="text-slate-800 leading-relaxed markdown-content">${sanitizedText}</div>
-                        <div class="mt-1 text-slate-400 text-xs">Medical Literature Not Verified</div> <!-- Original disclaimer -->
+                        <div class="mt-1 text-slate-400 text-xs">Medical Literature Not Verified</div>
                     </div>
                 `;
             }
 
             messagesContainer.appendChild(messageElement);
-            // Scroll handled in sendMessage to ensure it happens after adding
-             adjustMainPadding(); // Adjust padding after adding message
+            adjustMainPadding();
         }
 
-        // Event listeners (Original Enter key behavior)
+        // Event listeners
         sendButton.addEventListener('click', sendMessage);
         userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                 e.preventDefault(); // Prevent newline in input
-                 sendMessage();
+                e.preventDefault();
+                sendMessage();
             }
         });
     </script>
