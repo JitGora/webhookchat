@@ -12,7 +12,7 @@ WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('ui-float-input.html') ## new html template
 
 @app.route('/send', methods=['POST'])
 def send_message():
