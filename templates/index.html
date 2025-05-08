@@ -29,12 +29,15 @@
         body {
             display: flex;
             flex-direction: column;
+            position: relative;
         }
         
         main {
             flex: 1;
             overflow-y: auto;
             padding-bottom: calc(150px + var(--sat));
+            position: relative;
+            z-index: 1;
         }
         
         main::-webkit-scrollbar {
@@ -103,10 +106,10 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="sticky bottom-0 left-0 right-0 p-4 bg-slate-50 z-10 pb-[var(--sat)]">
+    <!-- Floating Footer -->
+    <footer class="fixed bottom-0 left-0 right-0 p-4 bg-slate-50 z-[100] pb-[var(--sat)]">
         <div class="max-w-3xl mx-auto">
-            <div class="relative">
+            <div class="relative transform transition-transform duration-300 ease-in-out" id="footer-container">
                 <div class="bg-white/80 backdrop-blur-sm rounded-xl border border-slate-200/80 shadow-lg">
                     <!-- Attachment Preview -->
                     <div id="attachment-preview" class="hidden p-3 border-b border-slate-200/50">
@@ -178,9 +181,38 @@
         const attachmentThumb = document.getElementById('attachment-thumb');
         const attachmentIcon = document.getElementById('attachment-icon');
         const removeAttachment = document.getElementById('remove-attachment');
+        const footerContainer = document.getElementById('footer-container');
         
         let selectedFile = null;
         let selectedFileDataUrl = null;
+        let isKeyboardVisible = false;
+
+        // Keyboard Handling
+        function updateFooterPosition() {
+            const visualViewport = window.visualViewport;
+            if (!visualViewport) return;
+
+            const keyboardHeight = window.innerHeight - visualViewport.height;
+            if (keyboardHeight > 100 && !isKeyboardVisible) {
+                footerContainer.style.transform = `translateY(-${keyboardHeight}px)`;
+                isKeyboardVisible = true;
+                
+                // Scroll to bottom when keyboard appears
+                setTimeout(() => {
+                    messagesContainer.scrollTo({
+                        top: messagesContainer.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }, 300);
+            } else if (keyboardHeight <= 100 && isKeyboardVisible) {
+                footerContainer.style.transform = '';
+                isKeyboardVisible = false;
+            }
+        }
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', updateFooterPosition);
+        }
 
         // Attachment Handling
         fileAttachButton.addEventListener('click', () => fileInput.click());
@@ -351,6 +383,11 @@
                 sendMessage();
             }
         });
+
+        // Initial setup
+        adjustMainPadding();
+        userInput.addEventListener('focus', updateFooterPosition);
+        userInput.addEventListener('blur', updateFooterPosition);
     </script>
 </body>
 </html>
